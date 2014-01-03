@@ -6,11 +6,11 @@ def listify(filename):
 setup(
     name = "python-smpp",
     version = "0.1",
-    url = 'http://github.com/dmaclay/python-smpp',
+    url = 'http://github.com/praekelt/python-smpp',
     license = 'BSD',
     description = "Python SMPP Library",
     long_description = open('README.rst','r').read(),
-    author = 'David Maclay',
+    author = 'Praekelt Foundation',
     author_email = 'dev@praekeltfoundation.org',
     packages = find_packages(),
     install_requires = ['setuptools'].extend(listify('requirements.pip')),
