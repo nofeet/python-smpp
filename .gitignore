@@ -5,3 +5,6 @@ ve/
 *_priv.py
 .coverage
 coverage-html/
+coverage.xml
+nosetests.xml
+pep8.txt
