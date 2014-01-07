@@ -15,8 +15,7 @@ class PDU(object):
         self.obj['header']['command_status'] = command_status
         self.obj['header']['sequence_number'] = sequence_number
 
-
-    def __add_optional_parameter(self, tag, value):
+    def add_optional_parameter(self, tag, value):
         if self.obj.get('body') == None:
             self.obj['body'] = {}
         if self.obj['body'].get('optional_parameters') == None:
@@ -28,13 +27,13 @@ class PDU(object):
             })
 
     def set_sar_msg_ref_num(self, value):
-        self.__add_optional_parameter('sar_msg_ref_num', value)
+        self.add_optional_parameter('sar_msg_ref_num', value)
 
     def set_sar_segment_seqnum(self, value):
-        self.__add_optional_parameter('sar_segment_seqnum', value)
+        self.add_optional_parameter('sar_segment_seqnum', value)
 
     def set_sar_total_segments(self, value):
-        self.__add_optional_parameter('sar_total_segments', value)
+        self.add_optional_parameter('sar_total_segments', value)
 
 
     def get_obj(self):
@@ -200,7 +199,7 @@ class SM1(PDU):
     def add_message_payload(self, value):
         self.obj['body']['mandatory_parameters']['sm_length'] = 0
         self.obj['body']['mandatory_parameters']['short_message'] = None
-        self._PDU__add_optional_parameter('message_payload', value)
+        self.add_optional_parameter('message_payload', value)
 
 
 class SubmitMulti(SM1):

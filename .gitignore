@@ -8,3 +8,4 @@ coverage-html/
 coverage.xml
 nosetests.xml
 pep8.txt
+dist/
