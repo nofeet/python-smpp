@@ -26,6 +26,10 @@ class PDU(object):
             'value':value,
             })
 
+    def __add_optional_parameter(self, tag, value):
+        # This is deprecated, but not everything has been updated yet.
+        return self.add_optional_parameter(tag, value)
+
     def set_sar_msg_ref_num(self, value):
         self.add_optional_parameter('sar_msg_ref_num', value)
 
