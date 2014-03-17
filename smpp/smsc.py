@@ -1,4 +1,5 @@
 import socket
+import warnings
 
 from esme import *
 
@@ -13,13 +14,12 @@ class SMSC(ESME): # this is a dummy SMSC, just for testing
         self.conn, self.addr = self.server.accept()
         print 'Connected by', self.addr
         while 1:
-            pdu = self._ESME__recv()
+            pdu = self._recv()
             if not pdu: break
-            self.conn.send(pack_pdu(self.__response(pdu)))
+            self.conn.send(pack_pdu(self._response(pdu)))
         self.conn.close()
 
-
-    def __response(self, pdu):
+    def _response(self, pdu):
         pdu_resp = {}
         resp_header = {}
         pdu_resp['header'] = resp_header
@@ -72,6 +72,10 @@ class SMSC(ESME): # this is a dummy SMSC, just for testing
                 resp_mandatory_parameters['error_code'] = 0
         return pdu_resp
 
+    def __response(self, pdu):
+        warnings.warn('SMSC.__response() is deprecated. Call _response() instead.',
+                      DeprecationWarning)
+        return self._unbind()
 
 
 if __name__ == '__main__':

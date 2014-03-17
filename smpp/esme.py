@@ -1,4 +1,5 @@
 import socket
+import warnings
 
 from pdu_builder import *
 
@@ -30,13 +31,12 @@ class ESME(object):
 
     def disconnect(self):
         if self.state in ['BOUND_TX', 'BOUND_RX', 'BOUND_TRX']:
-            self.__unbind()
+            self._unbind()
         if self.state in ['OPEN']:
             self.conn.close()
             self.state = 'CLOSED'
 
-
-    def __recv(self):
+    def _recv(self):
         pdu = None
         length_bin = self.conn.recv(4)
         if not length_bin:
@@ -52,8 +52,12 @@ class ESME(object):
                 print '...', pdu['header']['command_status']
             return pdu
 
+    def __recv(self):
+        warnings.warn('ESME.__recv() is deprecated. Call _recv() instead.',
+                      DeprecationWarning)
+        return self._recv()
 
-    def __is_ok(self, pdu, id_check=None):
+    def _is_ok(self, pdu, id_check=None):
         if (isinstance(pdu, dict)
                 and pdu.get('header',{}).get('command_status') == 'ESME_ROK'
                 and (id_check == None
@@ -62,6 +66,10 @@ class ESME(object):
         else:
             return False
 
+    def __is_ok(self, pdu, id_check=None):
+        warnings.warn('ESME.__is_ok() is deprecated. Call _is_ok() instead.',
+                      DeprecationWarning)
+        return self._is_ok(pdu, id_check)
 
     def bind_transmitter(self):
         if self.state in ['CLOSED']:
@@ -70,21 +78,24 @@ class ESME(object):
             pdu = BindTransmitter(self.sequence_number, **self.defaults)
             self.conn.send(pdu.get_bin())
             self.sequence_number +=1
-            if self.__is_ok(self.__recv(), 'bind_transmitter_resp'):
+            if self._is_ok(self._recv(), 'bind_transmitter_resp'):
                 self.state = 'BOUND_TX'
 
-
-    def __unbind(self):
+    def _unbind(self):
         if self.state in ['BOUND_TX', 'BOUND_RX', 'BOUND_TRX']:
             pdu = Unbind(self.sequence_number)
             self.conn.send(pdu.get_bin())
             self.sequence_number +=1
-            if self.__is_ok(self.__recv(), 'unbind_resp'):
+            if self._is_ok(self._recv(), 'unbind_resp'):
                 self.state = 'OPEN'
 
+    def __unbind(self):
+        warnings.warn('ESME.__unbind() is deprecated. Call _unbind() instead.',
+                      DeprecationWarning)
+        return self._unbind()
 
     #def unbind(self): # will probably be deprecated
-        #self.__unbind()
+        #self._unbind()
 
 
     def submit_sm(self, **kwargs):
@@ -93,8 +104,8 @@ class ESME(object):
             pdu = SubmitSM(self.sequence_number, **dict(self.defaults, **kwargs))
             self.conn.send(pdu.get_bin())
             self.sequence_number +=1
-            submit_sm_resp = self.__recv()
-            #print self.__is_ok(submit_sm_resp, 'submit_sm_resp')
+            submit_sm_resp = self._recv()
+            #print self._is_ok(submit_sm_resp, 'submit_sm_resp')
 
 
     def submit_multi(self, dest_address=[], **kwargs):
@@ -120,7 +131,7 @@ class ESME(object):
                         pdu.addDistributionList(item.get('dl_name'))
             self.conn.send(pdu.get_bin())
             self.sequence_number +=1
-            submit_multi_resp = self.__recv()
-            #print self.__is_ok(submit_multi_resp, 'submit_multi_resp')
+            submit_multi_resp = self._recv()
+            #print self._is_ok(submit_multi_resp, 'submit_multi_resp')
 
 
