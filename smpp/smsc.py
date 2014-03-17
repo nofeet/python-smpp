@@ -1,6 +1,13 @@
+import logging
 import socket
 
 from esme import *
+
+
+logger = logging.getLogger(__name__)
+stdout_stream_handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(stdout_stream_handler)
+logger.setLevel(logging.DEBUG)
 
 
 class SMSC(ESME): # this is a dummy SMSC, just for testing
@@ -11,7 +18,7 @@ class SMSC(ESME): # this is a dummy SMSC, just for testing
         self.server.bind(('', port))
         self.server.listen(1)
         self.conn, self.addr = self.server.accept()
-        print 'Connected by', self.addr
+        logger.info('Connected by %s', self.addr)
         while 1:
             pdu = self._ESME__recv()
             if not pdu: break

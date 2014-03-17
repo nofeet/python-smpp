@@ -1,6 +1,14 @@
+import logging
 import socket
+import sys
 
 from pdu_builder import *
+
+
+logger = logging.getLogger(__name__)
+stdout_stream_handler = logging.StreamHandler(sys.stdout)
+logger.addHandler(stdout_stream_handler)
+logger.setLevel(logging.DEBUG)
 
 
 class ESME(object):
@@ -47,9 +55,9 @@ class ESME(object):
                 length = int(binascii.b2a_hex(length_bin),16)
                 rest_bin = self.conn.recv(length-4)
                 pdu = unpack_pdu(length_bin + rest_bin)
-                print '...', pdu['header']['sequence_number'],
-                print '>',   pdu['header']['command_id'],
-                print '...', pdu['header']['command_status']
+                header = pdu['header']
+                logger.debug('... %d > %s ... %s', header['sequence_number'],
+                             header['command_id'], header['command_status'])
             return pdu
 
 
@@ -89,8 +97,9 @@ class ESME(object):
 
     def submit_sm(self, **kwargs):
         if self.state in ['BOUND_TX', 'BOUND_TRX']:
-            print dict(self.defaults, **kwargs)
-            pdu = SubmitSM(self.sequence_number, **dict(self.defaults, **kwargs))
+            submit_sm_kwargs = dict(self.defaults, **kwargs)
+            logger.debug(submit_sm_kwargs)
+            pdu = SubmitSM(self.sequence_number, **submit_sm_kwargs)
             self.conn.send(pdu.get_bin())
             self.sequence_number +=1
             submit_sm_resp = self.__recv()
